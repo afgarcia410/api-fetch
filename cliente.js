@@ -17,19 +17,19 @@ async function login(url, data) {
 
 async function init() {
     await login('http://localhost:3001/login', {
-        name: nombre,
-        password: contraseña
+        name: n.value,
+        password: p.value
     }).then(res => {
         token = res.data.token;
-        if(token && nombre && contraseña ){
+        if(token && n.value && p.value ){
             document.querySelector('form').style.display = 'none';
             document.getElementById('container').style.display = 'block';
-            this.expression();
         }else{
-            let contraseña = document.createElement('p');
+            let p = document.createElement('p');
             p.innerHTML = 'Fill the inputs'
-            document.querySelector('form').appendChild(contraseña);
+            document.querySelector('form').appendChild(p);
         }
+        openWsConnection();
         console.log("Token: " + token);
     }).catch(error => {
         console.log(error);
@@ -52,7 +52,30 @@ async function request(url, data) {
     return response.json();
 }
 
+//WEBSOCKET
 
+function openWsConnection(){
+
+    ws = new WebSocket("ws://localhost:3001/request?token=" + token);
+
+    ws.onopen = (event) => {
+        console.log("Conexion con WebSocket establecido.");
+    }
+
+    ws.onmessage = (event) => {
+        console.log("Mensaje WebSocket recibido: ", event.data);
+
+    }
+
+    ws.onerror = (event) => {
+        console.log("Error WebSocket recibido: ", event);
+    }
+
+    ws.onclose = (event) => {
+        console.log("Cconexion WebSocket cerrado.");
+    }
+}
+/*
 function expression(){
     boton2.addEventListener('click', () =>{
         request("http://localhost:3001/request", 
@@ -64,3 +87,4 @@ function expression(){
         }).catch(response => console.log(response));
     })
 }
+*/
